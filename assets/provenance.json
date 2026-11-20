@@ -1,0 +1,9 @@
+{
+  "source": "项目维护者提供的企鹅服小朋友三视图，源文件为 assets/reference.jpg",
+  "method": "原图嘴部局部几何形变、原图肤色纹理构造闭合眼睑与睫毛、透明抠底与统一缩放",
+  "logicalSize": [
+    224,
+    320
+  ],
+  "aiGenerated": false
+}
