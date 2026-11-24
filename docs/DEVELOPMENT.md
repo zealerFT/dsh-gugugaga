@@ -5,6 +5,8 @@
 - Node.js 22 或更新版本，使用 npm 与仓库中的 `package-lock.json`。
 - 仅素材处理和素材测试需要 Python 3 与 Pillow。
 
+这是本插件的构建环境。安装和运行 DSH 时还须满足相应宿主发行版的 Node.js 要求；桌面版使用内置运行时，安装入口见 [README](../README.md#快速安装)。
+
 ```bash
 npm ci --ignore-scripts
 npm run check
@@ -18,6 +20,7 @@ assets/              角色参考图、透明表情帧和来源记录
 scripts/             构建、预览服务与素材处理脚本
 tests/               Node 行为测试与 Python 素材测试
 lib/client.js        DSH 客户端构建产物，随源码提交
+locale/              插件管理页展示元信息，英文发现入口与中文翻译
 docs/screenshots/    实际 UI 效果图
 index.js             Host bundle 入口
 cordis.patch.yml     DSH 插件加载声明
@@ -34,6 +37,8 @@ cordis.patch.yml     DSH 插件加载声明
 5. 更新 README、CHANGELOG 与受影响的效果图。
 
 DSH 目录安装依赖已生成的 `lib/client.js`；仅修改 `src/` 不会改变安装后的行为。预览与 DSH 使用同一套 UI 和状态逻辑，只有状态来源不同。
+
+兼容版本写在 `package.json` 顶层 `engines.dsh`，并同步锁文件根包的声明。插件管理页标题和描述使用 `locale/*.json` 的 `meta`，通过 `exports` 暴露并随包发布；桌宠自身 UI 文案仍由 `src/i18n/index.ts` 管理。官方规范与当前分发状态见 [DSH 插件规范](../README.md#dsh-插件规范)。
 
 ## 素材环境
 

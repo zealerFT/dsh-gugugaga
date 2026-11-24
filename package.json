@@ -12,12 +12,11 @@
     ".": "./index.js",
     "./client": "./lib/client.js",
     "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json",
     "./assets/*": "./assets/*"
   },
-  "files": ["index.js", "lib", "assets", "cordis.patch.yml", "README.md", "CHANGELOG.md", "docs"],
-  "meta": {"title": "咕咕嘎嘎", "description": "企鹅服小朋友桌宠 · 工作状态、互动和专注陪伴"},
+  "files": ["index.js", "lib", "assets", "locale", "cordis.patch.yml", "README.md", "CHANGELOG.md", "docs"],
   "dsh": {
-    "engines": {"dsh": ">=0.2.2-rc.5"},
     "bundle": {"patch": "./cordis.patch.yml"},
     "client": {
       "platform": "web",
@@ -32,5 +31,5 @@
     "pack:local": "npm run build && npm pack --pack-destination dist --ignore-scripts"
   },
   "devDependencies": {"esbuild": "0.27.0"},
-  "engines": {"node": ">=22"}
+  "engines": {"node": ">=22", "dsh": ">=0.2.2-rc.5"}
 }
