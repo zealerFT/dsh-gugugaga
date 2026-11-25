@@ -1,9 +1,19 @@
 name: Publish plugin
 
 on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag to publish
+        required: true
+        type: string
   push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/release.yml'
     tags:
-      - 'v[0-9]*'
+      - 'v*'
 
 permissions:
   contents: read
@@ -12,11 +22,14 @@ jobs:
   release:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      RELEASE_TAG: ${{ inputs.tag || (github.ref_type == 'tag' && github.ref_name) || 'v1.0.0' }}
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ env.RELEASE_TAG }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -30,7 +43,7 @@ jobs:
           import { join } from 'node:path';
           const manifest = JSON.parse(await readFile('package.json', 'utf8'));
           const lockfile = JSON.parse(await readFile('package-lock.json', 'utf8'));
-          assert.equal(process.env.GITHUB_REF_NAME, `v${manifest.version}`);
+          assert.equal(process.env.RELEASE_TAG, `v${manifest.version}`);
           assert.equal(lockfile.version, manifest.version);
           assert.equal(lockfile.packages[''].version, manifest.version);
           const changelog = await readFile('CHANGELOG.md', 'utf8');
@@ -39,7 +52,7 @@ jobs:
           const notes = section.slice(section.indexOf('\n') + 1).trim();
           assert.ok(notes, 'Release notes must not be empty');
           const filename = `${manifest.name}-${manifest.version}.tgz`;
-          const instructions = `下载附件 **${filename}**，无需解压或构建。在 DSH「插件」页填写下载文件的绝对路径并安装。\n\n完整安装说明见 [README](https://github.com/${process.env.GITHUB_REPOSITORY}/blob/${process.env.GITHUB_REF_NAME}/README.md#快速安装)。`;
+          const instructions = `下载附件 **${filename}**，无需解压或构建。在 DSH「插件」页填写下载文件的绝对路径并安装。\n\n完整安装说明见 [README](https://github.com/${process.env.GITHUB_REPOSITORY}/blob/${process.env.RELEASE_TAG}/README.md#快速安装)。`;
           await writeFile(join(process.env.RUNNER_TEMP, 'release-notes.md'), `${instructions}\n\n${notes}\n`);
           await appendFile(process.env.GITHUB_ENV, `PLUGIN_VERSION=${manifest.version}\nPLUGIN_ARCHIVE=dist/${filename}\n`);
           NODE
@@ -60,7 +73,7 @@ jobs:
           else
             release_flags+=(--latest)
           fi
-          gh release create "$GITHUB_REF_NAME" "$PLUGIN_ARCHIVE" \
+          gh release create "$RELEASE_TAG" "$PLUGIN_ARCHIVE" \
             --verify-tag \
             --title "咕咕嘎嘎 v${PLUGIN_VERSION}" \
             --notes-file "$RUNNER_TEMP/release-notes.md" \
