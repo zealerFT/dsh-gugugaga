@@ -8,10 +8,6 @@ on:
         required: true
         type: string
   push:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/release.yml'
     tags:
       - 'v*'
 
@@ -23,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      RELEASE_TAG: ${{ inputs.tag || (github.ref_type == 'tag' && github.ref_name) || 'v1.0.0' }}
+      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
     permissions:
       contents: write
     steps:

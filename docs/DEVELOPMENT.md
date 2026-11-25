@@ -81,6 +81,8 @@ git push origin "v${plugin_version}"
 
 [发布工作流](../.github/workflows/release.yml)校验 tag 与包版本、锁文件一致，运行构建与测试，确认已提交的 client bundle 没有漂移，再打包并发布 Release。发布说明来自 CHANGELOG 对应版本；预发布版本标记为 Prerelease，正式版本标记为 Latest。工作流使用 GitHub 提供的临时令牌，无需在仓库中保存个人令牌。
 
+若推送 tag 后没有生成 Release，可在 GitHub **Actions → Publish plugin → Run workflow** 中填写已存在的版本 tag 重试。工作流始终检出指定 tag；普通 main 分支推送不触发发布。
+
 工作流成功后，在 Release 的 Assets 中确认 `.tgz` 下载入口可用。已发布的 tag 和安装包保持不变，后续修改使用新版本发布。
 
 ## 提交前
