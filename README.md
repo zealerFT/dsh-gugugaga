@@ -2,7 +2,7 @@
 
 DeepSeek Harness 的第三方企鹅服桌宠插件。跟着工作状态变化，也会摸头撒娇、吃小鱼、闭眼睡觉，嘴里念叨着「咕咕嘎嘎」「我里个嘎嘎」。
 
-[快速安装](#快速安装) · [功能](#功能) · [自定义台词](#自定义台词) · [DSH 插件规范](#dsh-插件规范) · [开发](docs/DEVELOPMENT.md)
+[下载 v1.0.0 安装包][plugin-download] · [最新 Release][plugin-releases] · [快速安装](#快速安装) · [功能](#功能) · [开发](docs/DEVELOPMENT.md)
 
 ![咕咕嘎嘎实际运行界面](docs/screenshots/overview.png)
 
@@ -69,48 +69,47 @@ npx @deepseek-ai/dsh web
 
 ### 获取插件
 
-仓库包含可直接加载的 `lib/client.js`，普通安装不需要执行 `npm install` 或构建：
+**[直接下载 dsh-gugugaga-pet-1.0.0.tgz][plugin-download]**，或在[最新 Release][plugin-releases] 的 **Assets** 中选择 `.tgz` 安装包。
 
-```bash
-git clone https://github.com/zealerFT/dsh-gugugaga.git
-cd dsh-gugugaga
-```
+安装包已经包含 `lib/client.js`、角色素材和插件声明，**无需解压、克隆仓库或运行构建命令**。GitHub 自动提供的 `Source code (zip)` 和 `Source code (tar.gz)` 是源码归档，普通安装请选择 `dsh-gugugaga-pet-1.0.0.tgz`。
 
-下面的终端示例使用 macOS / Linux shell。Windows 用户可通过应用内插件页填写克隆目录的完整路径。
+下载地址也可直接用于下方终端命令。安装包文件名中的版本与 Release tag、包内版本一致。
 
 ### 安装到桌面端
 
-推荐在桌面客户端「插件」页的安装入口填写仓库的**绝对路径**，确认安装并启用。该路径必须位于运行 DSH 的机器上；按宿主提示刷新界面或重启应用。
+推荐在桌面客户端「插件」页的安装入口填写已下载 `.tgz` 文件的**绝对路径**，确认安装并启用。文件必须位于运行 DSH 的机器上；按宿主提示刷新界面或重启应用。
 
-使用终端时，先在桌面应用菜单 **管理 dsh 命令…** 中安装命令，打开新终端，用 `dsh --version` 核对版本。按[官方内置命令要求][official-desktop-runtime]，首次启动完成初始化后，**完全退出桌面应用**，再在插件仓库目录运行：
+使用终端时，先在桌面应用菜单 **管理 dsh 命令…** 中安装命令，打开新终端，用 `dsh --version` 核对版本。按[官方内置命令要求][official-desktop-runtime]，首次启动完成初始化后，**完全退出桌面应用**，再运行：
 
 ```bash
-dsh plugin --profile desktop add "$PWD"
+dsh plugin --profile desktop add "https://github.com/zealerFT/dsh-gugugaga/releases/download/v1.0.0/dsh-gugugaga-pet-1.0.0.tgz"
 ```
 
 完成后重新打开桌面客户端。这里的 `dsh` 必须来自桌面版；**npm / npx 版 CLI 会拒绝管理 `desktop` profile**，具体边界见[官方 CLI 说明][official-cli]。
 
 ### 安装到 Web 端
 
-先启动过一次 Web 界面，再在插件仓库目录的另一个终端运行：
+先启动过一次 Web 界面，再在另一个终端运行：
 
 ```bash
-npx @deepseek-ai/dsh plugin --profile web add "$PWD"
+npx @deepseek-ai/dsh plugin --profile web add "https://github.com/zealerFT/dsh-gugugaga/releases/download/v1.0.0/dsh-gugugaga-pet-1.0.0.tgz"
 ```
 
 若已有与正在运行的 Web 宿主相同版本的 `dsh` 命令，也可以使用：
 
 ```bash
-dsh plugin --profile web add "$PWD"
+dsh plugin --profile web add "https://github.com/zealerFT/dsh-gugugaga/releases/download/v1.0.0/dsh-gugugaga-pet-1.0.0.tgz"
 ```
 
 安装与启动应使用同一 DSH 版本；使用固定版本时，两条 `npx` 命令都写成 `npx @deepseek-ai/dsh@<版本> ...`。使用自定义 profile 时，将 `web` 换成实际名称。
 
-Web 界面也支持在「插件」页填写绝对路径安装；远程部署时填写服务器上的路径。独立下载 `.tgz` 后，也可用包的绝对路径代替目录。宿主支持本地目录、tarball、Git 和 npm 来源，规则见[官方插件管理器][official-plugin-manager]。
+Web 界面也支持在「插件」页填写 `.tgz` 的绝对路径安装；远程部署时填写服务器上的路径。终端命令末尾的 URL 也可替换为安装包或源码目录的绝对路径。宿主支持本地目录、tarball、Git 和 npm 来源，规则见[官方插件管理器][official-plugin-manager]。
 
 ### 更新与移除
 
-在克隆目录运行 `git pull --ff-only`。目录链接安装需要按宿主提示重载；复制目录或 `.tgz` 安装需要重新安装更新后的包。若应用内入口提示已安装，可在「插件」页移除后重新添加该目录；桌宠保存在浏览器中的偏好不会随卸载清除。桌面终端安装仍需先退出应用。停用和移除均在对应 profile 操作。
+从[最新 Release][plugin-releases] 下载新版本 `.tgz`，通过原安装入口安装新版。若应用内入口提示已安装，可在「插件」页移除后重新安装；桌宠保存在浏览器中的偏好不会随卸载清除。桌面终端安装仍需先退出应用，停用和移除均在对应 profile 操作。
+
+源码目录安装可先运行 `git pull --ff-only`。目录链接安装需要按宿主提示重载；复制目录安装需要重新安装更新后的目录。
 
 ## DSH 插件规范
 
@@ -131,7 +130,9 @@ Web 界面也支持在「插件」页填写绝对路径安装；远程部署时�
 
 ### 分发与索引收录
 
-当前通过公开 Git 仓库、本地目录和 `.tgz` 分发，未发布 npm 包。`package.json` 保留 `private: true`，可用于本地安装，但会被[官方参考索引生成器][official-market]跳过。
+正式版本使用 **版本 tag + GitHub Release** 分发：tag 固定源码，Release 附带已构建的 `.tgz` 安装包、更新说明和下载地址。[GitHub 的 Release 机制][github-releases]本身基于 tag；DSH 接收的是包文件，并不要求插件必须托管在 GitHub。
+
+当前未发布 npm 包。`package.json` 的 `private: true` 限制 npm 发布，不影响 GitHub Release 的公开下载与 DSH 安装；[官方参考索引生成器][official-market]会跳过该标记的包。
 
 若要供第三方索引收录，需要满足其分发条件：
 
@@ -168,6 +169,8 @@ Web 界面也支持在「插件」页填写绝对路径安装；远程部署时�
 需要 Node.js 22 或更新版本。
 
 ```bash
+git clone https://github.com/zealerFT/dsh-gugugaga.git
+cd dsh-gugugaga
 npm ci --ignore-scripts
 npm run check
 npm run preview
@@ -210,3 +213,6 @@ npm run preview
 [official-client-modules]: https://github.com/deepseek-ai/deepseek-harness/blob/4b399c39a6d1479cd84ca591b4d7c88e24d38a96/docs/subsystems/client-modules.zh.md
 [official-display-meta]: https://github.com/deepseek-ai/deepseek-harness/blob/4b399c39a6d1479cd84ca591b4d7c88e24d38a96/docs/cookbook/adding-a-package.zh.md#plugin-display-metadata
 [official-market]: https://github.com/deepseek-ai/deepseek-harness/blob/4b399c39a6d1479cd84ca591b4d7c88e24d38a96/docs/user/guide/plugin-market.zh.md
+[plugin-download]: https://github.com/zealerFT/dsh-gugugaga/releases/download/v1.0.0/dsh-gugugaga-pet-1.0.0.tgz
+[plugin-releases]: https://github.com/zealerFT/dsh-gugugaga/releases/latest
+[github-releases]: https://docs.github.com/repositories/releasing-projects-on-github/about-releases

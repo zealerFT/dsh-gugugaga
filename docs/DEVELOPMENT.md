@@ -64,6 +64,25 @@ npm run pack:local
 
 `dist/` 与 `.preview/` 是本地产物，不提交。npm 包只包含运行时文件、素材和用户文档，不包含依赖目录、测试、开发缓存或用户配置。
 
+## 发布版本
+
+每个正式版本使用同名 Git tag 与 GitHub Release，例如 `v1.0.0`。安装包是 `npm pack` 生成的 `dsh-gugugaga-pet-1.0.0.tgz`，用户无需本地构建。
+
+1. 同步 `package.json`、`package-lock.json` 的版本，更新 CHANGELOG 对应的 `# X.Y.Z` 章节及 README 下载链接。
+2. 运行 `npm run check`，提交源码与 `lib/client.js`；首次发布使用当前尚未发布的包版本。
+3. 推送发布提交和对应 tag：
+
+```bash
+plugin_version=$(node -p 'require("./package.json").version')
+git tag -a "v${plugin_version}" -m "咕咕嘎嘎 v${plugin_version}"
+git push origin main
+git push origin "v${plugin_version}"
+```
+
+[发布工作流](../.github/workflows/release.yml)校验 tag 与包版本、锁文件一致，运行构建与测试，确认已提交的 client bundle 没有漂移，再打包并发布 Release。发布说明来自 CHANGELOG 对应版本；预发布版本标记为 Prerelease，正式版本标记为 Latest。工作流使用 GitHub 提供的临时令牌，无需在仓库中保存个人令牌。
+
+工作流成功后，在 Release 的 Assets 中确认 `.tgz` 下载入口可用。已发布的 tag 和安装包保持不变，后续修改使用新版本发布。
+
 ## 提交前
 
 - 构建与相关测试通过，生成文件与源码一致。

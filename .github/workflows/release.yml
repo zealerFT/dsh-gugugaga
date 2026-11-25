@@ -1,0 +1,67 @@
+name: Publish plugin
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*'
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Check version and prepare release notes
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import { readFile, writeFile, appendFile } from 'node:fs/promises';
+          import { join } from 'node:path';
+          const manifest = JSON.parse(await readFile('package.json', 'utf8'));
+          const lockfile = JSON.parse(await readFile('package-lock.json', 'utf8'));
+          assert.equal(process.env.GITHUB_REF_NAME, `v${manifest.version}`);
+          assert.equal(lockfile.version, manifest.version);
+          assert.equal(lockfile.packages[''].version, manifest.version);
+          const changelog = await readFile('CHANGELOG.md', 'utf8');
+          const section = changelog.split(/^# /m).find(entry => entry.startsWith(`${manifest.version}\n`));
+          assert.ok(section, 'CHANGELOG.md must contain this version');
+          const notes = section.slice(section.indexOf('\n') + 1).trim();
+          assert.ok(notes, 'Release notes must not be empty');
+          const filename = `${manifest.name}-${manifest.version}.tgz`;
+          const instructions = `下载附件 **${filename}**，无需解压或构建。在 DSH「插件」页填写下载文件的绝对路径并安装。\n\n完整安装说明见 [README](https://github.com/${process.env.GITHUB_REPOSITORY}/blob/${process.env.GITHUB_REF_NAME}/README.md#快速安装)。`;
+          await writeFile(join(process.env.RUNNER_TEMP, 'release-notes.md'), `${instructions}\n\n${notes}\n`);
+          await appendFile(process.env.GITHUB_ENV, `PLUGIN_VERSION=${manifest.version}\nPLUGIN_ARCHIVE=dist/${filename}\n`);
+          NODE
+      - run: npm ci --ignore-scripts
+      - run: npm run check
+      - name: Verify committed client bundle
+        run: git diff --exit-code -- lib/client.js
+      - name: Pack installable plugin
+        run: npm pack --pack-destination dist --ignore-scripts
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          release_flags=()
+          if [[ "$PLUGIN_VERSION" == *-* ]]; then
+            release_flags+=(--prerelease)
+          else
+            release_flags+=(--latest)
+          fi
+          gh release create "$GITHUB_REF_NAME" "$PLUGIN_ARCHIVE" \
+            --verify-tag \
+            --title "咕咕嘎嘎 v${PLUGIN_VERSION}" \
+            --notes-file "$RUNNER_TEMP/release-notes.md" \
+            "${release_flags[@]}"
